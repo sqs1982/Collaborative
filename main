@@ -1,0 +1,209 @@
+function [IU,SU,RU,IB,SB,RB]=main(N,p1,p2,p3,q4,q5)
+N=2000; 
+KK=3;
+pp=0.6;
+a=0.2;   
+b=0.2; 
+r=0.2;
+th=0.2;
+de=1;
+tt=1000;  
+kk=30;%
+IU=zeros(tt,kk);SU=zeros(tt,kk);RU=zeros(tt,kk);IB=zeros(tt,kk);SB=zeros(tt,kk);RB=zeros(tt,kk);  
+[Nodes]=ws_net(N,KK,pp);
+%[Nodes]=BA2(N,KK);
+for ii=1:tt 
+[B]=paperinitial2(N);    
+for j=1:kk 
+    q=0;
+    p=1;
+    B(2,1:N)=0;
+    for i=1:N             
+      if  B(1,i)==2  
+               q=q+1;
+               z(q)=i;    
+      elseif B(1,i)==4 
+                 q=q+1;
+                 z(q)=i;    
+       elseif B(1,i)==5 
+                 q=q+1;
+                 z(q)=i;    
+       elseif B(1,i)==6 
+                 q=q+1;
+                 z(q)=i;            
+      end
+    end
+    for xa=p:q  
+        n=z(xa); 
+        XLAWZ=find(Nodes(n,:)==1);              
+        XLA=length(XLAWZ)-1;   
+        if B(1,n)==2  
+            for   k=1:XLA
+                     if  B(1,XLAWZ(k))==1&&B(2,XLAWZ(k))==0   
+                          e1=rand(1);
+                          if e1<a
+                              B(1,XLAWZ(k))=2;
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<a+r
+                              B(1,XLAWZ(k))=3;
+                              B(2,XLAWZ(k))=1;  
+                          end
+                    elseif B(1,XLAWZ(k))==4&&B(2,XLAWZ(k))==0 
+                          e1=rand(1);
+                          if e1<a
+                              B(1,XLAWZ(k))=5;
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<a+r
+                              B(1,XLAWZ(k))=6;
+                              B(2,XLAWZ(k))=1;  
+                          end 
+                     end
+            end 
+            e2=rand(1);  
+            if e2<b 
+               B(1,n)=3; 
+               B(2,n)=1; 
+            end
+        end
+        if B(1,n)==4  %扩散节点如果是IB
+            for   k=1:XLA
+                     if  B(1,XLAWZ(k))==1&&B(2,XLAWZ(k))==0   
+                          e1=rand(1);
+                          if e1<th
+                              B(1,XLAWZ(k))=4;
+                              B(2,XLAWZ(k))=1;
+                          end
+                    elseif B(1,XLAWZ(k))==2&&B(2,XLAWZ(k))==0  
+                          e1=rand(1);
+                          if e1<(1-b)*th*de
+                              B(1,XLAWZ(k))=5;  %SB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<b*(1-th*de)+th*de
+                              B(1,XLAWZ(k))=3;  %RU
+                              B(2,XLAWZ(k))=1;                              
+                          end                        
+                    elseif B(1,XLAWZ(k))==3&&B(2,XLAWZ(k))==0  
+                        e1=rand(1);
+                         if e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                         end
+                     end
+            end    
+        end
+        if B(1,n)==5  %扩散节点如果是SB
+            for   k=1:XLA
+                     if  B(1,XLAWZ(k))==1&&B(2,XLAWZ(k))==0   %IU
+                        e1=rand(1);
+                         if e1<th*(1-a-r)
+                              B(1,XLAWZ(k))=4;  %IB
+                              B(2,XLAWZ(k))=1;
+                         elseif e1<th*(1-r)
+                              B(1,XLAWZ(k))=5;  %SB
+                              B(2,XLAWZ(k))=1;   
+                         elseif e1<th
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1; 
+                        elseif  e1<th+a*(1-th)
+                              B(1,XLAWZ(k))=2;  %SU
+                              B(2,XLAWZ(k))=1; 
+                        elseif  e1<th+(a+r)*(1-th)
+                              B(1,XLAWZ(k))=3;  %RU
+                              B(2,XLAWZ(k))=1;       
+                         end
+                    elseif B(1,XLAWZ(k))==2&&B(2,XLAWZ(k))==0  %SU
+                          e1=rand(1);
+                          if e1<(1-b)*th*de
+                              B(1,XLAWZ(k))=5;  %SB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<b*(1-th*de)+th*de
+                              B(1,XLAWZ(k))=3;  %RU
+                              B(2,XLAWZ(k))=1;                              
+                          end                         
+                    elseif B(1,XLAWZ(k))==3&&B(2,XLAWZ(k))==0  %
+                         e1=rand(1);
+                         if e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                         end    
+                    elseif B(1,XLAWZ(k))==4&&B(2,XLAWZ(k))==0  %  
+                         e1=rand(1);
+                          if e1<a
+                              B(1,XLAWZ(k))=5;
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<a+r
+                              B(1,XLAWZ(k))=6;
+                              B(2,XLAWZ(k))=1;  
+                          end                      
+                     end
+            end 
+            e2=rand(1);  
+            if e2<b
+               B(1,n)=6;
+               B(1,n)=1;  
+            end
+        end
+        if B(1,n)==6 %扩散节点如果是RB
+            for   k=1:XLA
+                     if  B(1,XLAWZ(k))==1&&B(2,XLAWZ(k))==0   %
+                          e1=rand(1);
+                          if e1<th
+                              B(1,XLAWZ(k))=4;
+                              B(2,XLAWZ(k))=1;
+                          end
+                    elseif B(1,XLAWZ(k))==2&&B(2,XLAWZ(k))==0  %
+                           e1=rand(1);
+                          if e1<(1-b)*th*de
+                              B(1,XLAWZ(k))=5;  %SB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                          elseif e1<b*(1-th*de)+th*de
+                              B(1,XLAWZ(k))=3;  %RU
+                              B(2,XLAWZ(k))=1;                              
+                          end    
+                    elseif B(1,XLAWZ(k))==3&&B(2,XLAWZ(k))==0  %
+                          e1=rand(1);
+                         if e1<th*de
+                              B(1,XLAWZ(k))=6;  %RB
+                              B(2,XLAWZ(k))=1;
+                         end 
+                     end
+            end 
+        end
+
+    end
+IU(ii,j)=length(find(B(1,:)==1))/N;  
+SU(ii,j)=length(find(B(1,:)==2))/N;
+RU(ii,j)=length(find(B(1,:)==3))/N;
+IB(ii,j)=(length(find(B(1,:)==4)))/N;
+SB(ii,j)=(length(find(B(1,:)==5)))/N;
+RB(ii,j)=(length(find(B(1,:)==6)))/N; 
+end
+end
+plot(1:j,mean(IU),'-k');%  
+hold on
+plot(1:j,mean(SB),'-rd');%  
+hold on
+plot(1:j,mean(SU),'-ro');%  
+hold on
+plot(1:j,mean(RU),'-kx');%  
+hold on
+plot(1:j,mean(RB),'--k*');%  
+hold on
+plot(1:j,mean(IB),'-.k');%  
+hold on
+% plot(1:j,mean(RU)+mean(RB),'-ko');%  
+% hold on
+xlabel('时间')
+ylabel('节点比例')
+axis([1 30 0 1])
+legend('I_U''S_B','S_U','R_U','R_B','I_B');
+end
